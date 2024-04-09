@@ -1,0 +1,47 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ustar-backend
+    container_name: ustar-backend
+    ports:
+      - '8080:8080'
+#   networks:
+#     - traefik_network
+
+# scylladb:
+#   image: scylladb/scylla
+#   container_name: scylladb
+#   ports:
+#     - '9042:9042' # CQL port
+#     - '9160:9160' # Thrift port
+#   volumes:
+#     - ./scylla:/var/lib/scylla
+#   networks:
+#     - traefik_network
+
+#   traefik:
+#     image: "traefik:v3"
+#     container_name: traefik
+#     command:
+#       - "--api.insecure=true"
+#       - "--providers.docker=true"
+#       - "--entrypoints.web.address=:80"
+#       - "--entrypoints.websecure.address=:443"
+#       - "--certificatesresolvers.cloudflare.acme.email=your-email@example.com"
+#       - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
+#       - "--certificatesresolvers.cloudflare.acme.dnschallenge=true"
+#       - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#       - "./letsencrypt:/letsencrypt"
+#     networks:
+#       - traefik_network
+
+# networks:
+#   traefik_network:
+#     external: true
