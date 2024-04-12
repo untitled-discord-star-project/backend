@@ -7,17 +7,17 @@ services:
     container_name: ustar-backend
     ports:
       - '8080:8080'
-#   networks:
-#     - traefik_network
+  #   networks:
+  #     - traefik_network
 
-# scylladb:
-#   image: scylladb/scylla
-#   container_name: scylladb
-#   ports:
-#     - '9042:9042' # CQL port
-#     - '9160:9160' # Thrift port
-#   volumes:
-#     - ./scylla:/var/lib/scylla
+  scylladb:
+    image: scylladb/scylla
+    container_name: scylladb
+    ports:
+      - '9042:9042' # CQL port
+      - '9160:9160' # Thrift port
+    volumes:
+      - ./scylla:/var/lib/scylla
 #   networks:
 #     - traefik_network
 
