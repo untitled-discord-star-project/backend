@@ -11,7 +11,7 @@ templ IndexContent(text string) {
 	<div class="speech-bubble" id="speech-bubble">
 		@SpeechBubble(text)
 	</div>
-	<div hx-get="/api/v1/starboard" hx-target="#speech-bubble" >
+	<div hx-get="/ui/quote" hx-target="#speech-bubble" >
 		<img
 			src="/static/andoid.png"
 			alt="andoid"

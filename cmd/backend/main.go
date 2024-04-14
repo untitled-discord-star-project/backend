@@ -21,11 +21,13 @@ func main() {
 	port := flag.Int("port", 8080, "port to listen on")
 	flag.Parse()
 
-	indexTemplate := templates.Index("2so cool!!")
-	indexEndpoint := handlers.CreateIndexEndpoint(indexTemplate)
-
 	db := initDatabase()
 	defer db.Close()
+
+	indexTemplate := templates.Index("2so cool!!")
+	indexEndpoint := handlers.CreateIndexEndpoint(indexTemplate)
+	UiEndpoint := handlers.CreateUiEndpoints(*db)
+	APIEnpoints := handlers.CreateAPIEndpoints(*db)
 
 	var handler http.HandlerFunc = func(w http.ResponseWriter, r *http.Request) {
 		switch {
@@ -33,10 +35,12 @@ func main() {
 			indexEndpoint(w, r)
 		case strings.HasPrefix(r.URL.Path, "/static"):
 			handlers.FilesEndpoint(w, r)
+		case strings.HasPrefix(r.URL.Path, "/ui"):
+			UiEndpoint(w, r)
+		case strings.HasPrefix(r.URL.Path, "/api"):
+			APIEnpoints(w, r)
 		case r.URL.Path == "/message":
 			handlers.MessageEndpoint(w, r)
-		case r.URL.Path == "/api/v1/starboard":
-			handlers.StarboardEndpoint(w, r, db)
 		default:
 			http.NotFound(w, r)
 		}

@@ -70,7 +70,7 @@ func IndexContent(text string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div hx-get=\"/api/v1/starboard\" hx-target=\"#speech-bubble\"><img src=\"/static/andoid.png\" alt=\"andoid\" class=\"logo\"></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><div hx-get=\"/ui/quote\" hx-target=\"#speech-bubble\"><img src=\"/static/andoid.png\" alt=\"andoid\" class=\"logo\"></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
