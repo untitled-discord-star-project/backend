@@ -7,6 +7,7 @@ COPY cmd cmd
 COPY internal internal
 COPY pkg pkg
 COPY templates templates
+COPY models models
 
 RUN go install github.com/a-h/templ/cmd/templ@latest
 RUN templ generate
