@@ -20,3 +20,7 @@
 # Go workspace file
 go.work
 tmp/
+
+# Docker volumes
+scylla/
+letsencrypt/

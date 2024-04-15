@@ -1,0 +1,63 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ustar-backend
+    container_name: ustar-backend
+    ports:
+      - '8080:8080'
+  #   networks:
+  #     - traefik_network
+
+  scylla-node1:
+    container_name: scylla-node1
+    image: scylladb/scylla
+    restart: always
+    ports:
+      - '9042:9042' # CQL port
+      - '9160:9160' # Thrift port
+    command: --seeds=scylla-node1 --smp 1 --memory 2G --overprovisioned 1
+    volumes:
+      - ./db/schema:/init
+    networks:
+      - traefik_network
+
+  cqlsh:
+    image: scylladb/scylla
+    depends_on:
+      - scylla-node1
+    entrypoint: ['/bin/bash', '-c']
+    command: [
+        # seeding or something idk man
+        'sleep 10 && cat /init/discord_starboard.cql | cqlsh scylla-node1 9042',
+      ]
+    volumes:
+      - ./db/schema:/init
+    networks:
+      - traefik_network
+#   networks:
+#     - traefik_networks
+#   traefik:
+#     image: "traefik:v3"
+#     container_name: traefik
+#     command:
+#       - "--api.insecure=true"
+#       - "--providers.docker=true"
+#       - "--entrypoints.web.address=:80"
+#       - "--entrypoints.websecure.address=:443"
+#       - "--certificatesresolvers.cloudflare.acme.email=your-email@example.com"
+#       - "--certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json"
+#       - "--certificatesresolvers.cloudflare.acme.dnschallenge=true"
+#       - "--certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare"
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#       - "./letsencrypt:/letsencrypt"
+#     networks:
+#       - traefik_network
+networks:
+  traefik_network:
+    external: true

@@ -8,10 +8,10 @@ templ Index(text string) {
 
 templ IndexContent(text string) {
 <div class="container">
-	<div class="speech-bubble">
-		<h1>{ text }</h1>
+	<div class="speech-bubble" id="speech-bubble">
+		@SpeechBubble(text)
 	</div>
-	<div>
+	<div hx-get="/ui/quote" hx-target="#speech-bubble" >
 		<img
 			src="/static/andoid.png"
 			alt="andoid"
