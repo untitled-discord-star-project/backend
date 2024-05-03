@@ -1,8 +1,8 @@
 package trace
 
-import "github.com/google/uuid"
+import "github.com/oklog/ulid/v2"
 
 type Trace struct {
-	TraceID uuid.UUID
-	RequestID uuid.UUID
+	TraceID   ulid.ULID
+	RequestID ulid.ULID
 }
