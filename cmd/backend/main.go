@@ -46,6 +46,7 @@ func main() {
 		}
 	}
 
+	handler = middleware.CompressionMiddleware(handler)
 	handler = middleware.RecordResponse(handler)
 	handler = middleware.Recovery(handler)
 	handler = middleware.PermissiveCORSHandler(handler)

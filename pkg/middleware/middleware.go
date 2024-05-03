@@ -1,21 +1,25 @@
 package middleware
 
 import (
+	"compress/gzip"
+	"io"
 	"log/slog"
 	"net/http"
 	"os"
 	"runtime/debug"
+	"strings"
 	"time"
 
 	"github.com/untitled-discord-star-project/backend/pkg/ctxutil"
 	"github.com/untitled-discord-star-project/backend/pkg/trace"
 
+	"github.com/andybalholm/brotli"
 	"github.com/google/uuid"
 )
 
 func Trace(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context();
+		ctx := r.Context()
 
 		traceID, err := uuid.Parse(r.Header.Get("X-Trace-ID"))
 		if err != nil {
@@ -34,7 +38,7 @@ func Trace(next http.HandlerFunc) http.HandlerFunc {
 		r.Header.Set("X-Trace-ID", trace.TraceID.String())
 		r.Header.Set("X-Request-ID", trace.RequestID.String())
 
-		next.ServeHTTP(w, r) 
+		next.ServeHTTP(w, r)
 	}
 }
 
@@ -59,7 +63,7 @@ func Log(next http.Handler) http.HandlerFunc {
 }
 
 func PermissiveCORSHandler(next http.HandlerFunc) http.HandlerFunc {
-	return func (w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Access-Control-Allow-Credentials", "true")
 		w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
@@ -75,8 +79,8 @@ func PermissiveCORSHandler(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func RecordResponse(next http.Handler) http.HandlerFunc {
-	return func (w http.ResponseWriter, r *http.Request) {
-		rrw := &RecordingResponseWriter{ ResponseWriter: w }
+	return func(w http.ResponseWriter, r *http.Request) {
+		rrw := &RecordingResponseWriter{ResponseWriter: w}
 		start := time.Now()
 
 		next.ServeHTTP(rrw, r)
@@ -93,7 +97,7 @@ func RecordResponse(next http.Handler) http.HandlerFunc {
 }
 
 func Recovery(next http.Handler) http.HandlerFunc {
-	return func (w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err := recover(); err != nil {
 				stack := debug.Stack()
@@ -111,4 +115,35 @@ func Recovery(next http.Handler) http.HandlerFunc {
 		}()
 		next.ServeHTTP(w, r)
 	}
+}
+
+type compressionResponseWriter struct {
+	io.Writer
+	http.ResponseWriter
+}
+
+func (w compressionResponseWriter) Write(b []byte) (int, error) {
+	return w.Writer.Write(b)
+}
+
+func CompressionMiddleware(next http.Handler) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		encodings := r.Header.Get("Accept-Encoding")
+
+		if strings.Contains(encodings, "br") {
+			w.Header().Set("Content-Encoding", "br")
+			br := brotli.NewWriterLevel(w, brotli.DefaultCompression)
+			defer br.Close()
+
+			w = compressionResponseWriter{Writer: br, ResponseWriter: w}
+		} else if strings.Contains(encodings, "gzip") {
+			w.Header().Set("Content-Encoding", "gzip")
+			gz := gzip.NewWriter(w)
+			defer gz.Close()
+
+			w = compressionResponseWriter{Writer: gz, ResponseWriter: w}
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

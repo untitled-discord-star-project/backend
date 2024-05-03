@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/andybalholm/brotli v1.1.0
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed // indirect
 	github.com/scylladb/go-reflectx v1.0.1 // indirect
