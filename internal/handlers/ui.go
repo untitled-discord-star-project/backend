@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"net/http"
@@ -15,7 +14,8 @@ import (
 )
 
 func CreateUiEndpoints(db gocqlx.Session) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {)
+	return func(w http.ResponseWriter, r *http.Request) {
+
 		w.Header().Set("Content-Type", "text/html")
 		switch {
 		case strings.HasPrefix(r.URL.Path, "/ui/quote"):
